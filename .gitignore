@@ -1,0 +1,9 @@
+# This repository should only contain YAML files, so ignore everything else
+*
+!*.yaml
+
+# Ofcourse we do want certain GIT specific files to be included
+!.gitignore
+
+# Prevent explicit sharing of secrets
+secrets.yaml
