@@ -1,8 +1,8 @@
 substitutions:
   ip_address: 192.168.178.211
   device_name: "lights-backdoor"
-  sensor_name: "lights_backdoor"
-  friendly_name: "Lichtknop achterdeur"
+  switch_name: "Lichtpunt achterdeur"
+  sensor_name: "Lichtknop achterdeur"
 
 esphome:
   name: ${device_name}
@@ -42,31 +42,34 @@ web_server:
 # Text sensors with general information.
 text_sensor:
   - platform: version
-    name: ${sensor_name}_esphome_version
+    name: ${device_name}-esphome-version
   - platform: wifi_info
     ip_address:
-      name: ${sensor_name}_ip_address
+      name: ${device_name}-ip-address
 
 # Sensors with general information.
 sensor:
   - platform: uptime
-    name: ${sensor_name}_uptime
+    name: ${device_name}-uptime
+    entity_category: diagnostic
 
   - platform: wifi_signal
-    name: ${sensor_name}_wifi_signal
+    name: ${device_name}-wifi-signal
     update_interval: 60s
+    entity_category: diagnostic
 
 # Shelly 1 detached switch config with fallback in case of wifi or api fail
 switch:
   - platform: gpio
     id: shelly_relay
-    name: ${friendly_name}
+    name: ${switch_name}
+    icon: mdi:lightning-bolt
     pin: GPIO4
 
 binary_sensor:
   - platform: gpio
-    name: ${sensor_name}_input
-    device_class: light
+    id: shelly_input
+    name: ${sensor_name}
     pin:
       number: GPIO5
     # small delay to prevent debouncing

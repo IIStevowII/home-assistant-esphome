@@ -1,13 +1,14 @@
 substitutions:
   ip_address: 192.168.178.210
   device_name: "lights-entry"
-  sensor_name: "lights_entry"
+  channel_1: "lights-hallway"
+  channel_2: "lights-frontdoor"
 
-  sensor_1: "lights_hallway"
-  channel_1: Verlichting hal
+  switch_name_1: "Lichtpunt hal"
+  sensor_name_1: "Lichtknop hal"
 
-  sensor_2: "lights_frontdoor"
-  channel_2: Verlichting voordeur
+  switch_name_2: "Lichtpunt voordeur"
+  sensor_name_2: "Lichtknop voordeur"
 
   max_power: "2000.0"
   max_temp: "70.0"
@@ -50,10 +51,10 @@ web_server:
 # Text sensors with general information.
 text_sensor:
   - platform: version
-    name: ${sensor_name}_esphome_version
+    name: ${device_name}-esphome-version
   - platform: wifi_info
     ip_address:
-      name: ${sensor_name}_ip_address
+      name: ${device_name}-ip-address
 
 time:
   - platform: sntp
@@ -67,30 +68,30 @@ sensor:
   - platform: ade7953
     irq_pin: GPIO16 # Prevent overheating by setting this
     voltage:
-      name: ${sensor_name}_voltage
+      name: ${device_name}-voltage
     # On the Shelly 2.5 channels are mixed ch1=B ch2=A
     current_a:
-      name: ${sensor_2}_current
+      name: ${channel_2}-current
       internal: true
     current_b:
-      name: ${sensor_1}_current
+      name: ${channel_1}-current
       internal: true
     active_power_a:
-      name: ${sensor_2}_power
+      name: ${channel_2}-power
       id: power_sensor_2
       # active_power_a is normal, so don't multiply by -1
       on_value_range:
         - above: ${max_power}
           then:
-            - light.turn_off: light_2
+            - switch.turn_off: shelly_25_relay_2
             - homeassistant.service:
                 service: persistent_notification.create
                 data:
                   title: Message from ${devicename}
                 data_template:
-                  message: ${channel_2} turned off because power exceeded ${max_power}W
+                  message: ${switch_name_2} turned off because power exceeded ${max_power}W
     active_power_b:
-      name: ${sensor_1}_power
+      name: ${channel_1}-power
       id: power_sensor_1
       # active_power_b is inverted, so multiply by -1
       filters:
@@ -98,17 +99,17 @@ sensor:
       on_value_range:
         - above: ${max_power}
           then:
-            - light.turn_off: light_1
+            - switch.turn_off: shelly_25_relay_1
             - homeassistant.service:
                 service: persistent_notification.create
                 data:
                   title: Message from ${devicename}
                 data_template:
-                  message: ${channel_1} turned off because power exceeded ${max_power}W
+                  message: ${switch_name_1} turned off because power exceeded ${max_power}W
     update_interval: 30s
 
   - platform: total_daily_energy
-    name: ${sensor_1}_energy
+    name: ${channel_1}-energy
     power_id: power_sensor_1
     filters:
       # Multiplication factor from W to kWh is 0.001
@@ -116,7 +117,7 @@ sensor:
     unit_of_measurement: kWh
 
   - platform: total_daily_energy
-    name: ${sensor_2}_energy
+    name: ${channel_2}-energy
     power_id: power_sensor_2
     filters:
       # Multiplication factor from W to kWh is 0.001
@@ -126,7 +127,7 @@ sensor:
   # NTC Temperature
   - platform: ntc
     sensor: temp_resistance_reading
-    name: ${sensor_name}_temperature
+    name: ${device_name}-temperature
     unit_of_measurement: "°C"
     accuracy_decimals: 1
     icon: "mdi:thermometer"
@@ -137,14 +138,14 @@ sensor:
     on_value_range:
       - above: ${max_temp}
         then:
-          - light.turn_off: light_1
-          - light.turn_off: light_2
+          - switch.turn_off: shelly_25_relay_1
+          - switch.turn_off: shelly_25_relay_2
           - homeassistant.service:
               service: persistent_notification.create
               data:
                 title: Message from ${devicename}
               data_template:
-                message: Switch turned off because temperature exceeded ${max_temp}°C
+                message: Switches turned off because temperature exceeded ${max_temp}°C
   - platform: resistance
     id: temp_resistance_reading
     sensor: temp_analog_reading
@@ -154,28 +155,22 @@ sensor:
     id: temp_analog_reading
     pin: A0
 
-output:
+switch:
   - platform: gpio
-    pin: GPIO4
     id: shelly_25_relay_1
+    name: ${switch_name_1}
+    icon: mdi:lightning-bolt
+    pin: GPIO4
   - platform: gpio
-    pin: GPIO15
     id: shelly_25_relay_2
-
-light:
-  - platform: binary
-    id: light_1
-    name: ${channel_1}
-    output: shelly_25_relay_1
-  - platform: binary
-    id: light_2
-    name: ${channel_2}
-    output: shelly_25_relay_2
+    name: ${switch_name_2}
+    icon: mdi:lightning-bolt
+    pin: GPIO15
 
 binary_sensor:
   - platform: gpio
-    name: "${sensor_1}_input"
-    device_class: light
+    id: shelly_input_1
+    name: "${sensor_name_1}"
     pin:
       number: GPIO13
     # small delay to prevent debouncing
@@ -194,10 +189,10 @@ binary_sensor:
                 # We let Home Assistant decide what to do with it
               else:
                 # else, toggle relay
-                - light.toggle: light_1
+                - switch.toggle: shelly_25_relay_1
   - platform: gpio
-    name: "${sensor_2}_input"
-    device_class: light
+    id: shelly_input_2
+    name: "${sensor_name_2}"
     pin:
       number: GPIO5
     # small delay to prevent debouncing
@@ -216,4 +211,4 @@ binary_sensor:
                 # We let Home Assistant decide what to do with it
               else:
                 # else, toggle relay
-                - light.toggle: light_2
+                - switch.toggle: shelly_25_relay_2
