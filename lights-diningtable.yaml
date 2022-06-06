@@ -1,0 +1,91 @@
+substitutions:
+  ip_address: 192.168.178.212
+  device_name: "lights-diningtable"
+  switch_name: "Lichtpunt eettafel"
+  sensor_name: "Lichtknop eettafel"
+
+esphome:
+  name: ${device_name}
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: ${ip_address}
+    gateway: 192.168.178.1
+    subnet: 255.255.255.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${device_name}-ap
+    password: !secret hotspot_pass
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret esphome_api_password
+
+# Enable OTA updates
+ota:
+  password: !secret esphome_api_password
+
+# Enable Web server (optional).
+web_server:
+  port: 80
+
+# Text sensors with general information.
+text_sensor:
+  - platform: version
+    name: ${device_name}-esphome-version
+  - platform: wifi_info
+    ip_address:
+      name: ${device_name}-ip-address
+
+# Sensors with general information.
+sensor:
+  - platform: uptime
+    name: ${device_name}-uptime
+    entity_category: diagnostic
+
+  - platform: wifi_signal
+    name: ${device_name}-wifi-signal
+    update_interval: 60s
+    entity_category: diagnostic
+
+# Shelly 1 detached switch config with fallback in case of wifi or api fail
+switch:
+  - platform: gpio
+    id: shelly_relay
+    name: ${switch_name}
+    icon: mdi:lightning-bolt
+    pin: GPIO4
+
+binary_sensor:
+  - platform: gpio
+    id: shelly_input
+    name: ${sensor_name}
+    pin:
+      number: GPIO5
+    # small delay to prevent debouncing
+    filters:
+      - delayed_on_off: 50ms
+    # config for state change of input button
+    on_state:
+        then:
+          - if:
+              condition:
+                and:
+                  - wifi.connected:
+                  - api.connected:
+              then:
+                # Do nothing, as the state of the binary sensor is already communicated
+                # We let Home Assistant decide what to do with it
+              else:
+                # else, toggle relay
+                - switch.toggle: shelly_relay
