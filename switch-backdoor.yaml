@@ -1,6 +1,6 @@
 substitutions:
   ip_address: 192.168.178.211
-  device_name: "lights-backdoor"
+  device_name: "switch-backdoor"
   switch_name: "Lichtpunt achterdeur"
   sensor_name: "Lichtknop achterdeur"
 

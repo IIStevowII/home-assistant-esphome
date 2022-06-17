@@ -1,6 +1,6 @@
 substitutions:
   ip_address: 192.168.178.220
-  device_name: "lights-firstfloor"
+  device_name: "switch-firstfloor"
   switch_name: "Lichtpunt overloop"
   sensor_name: "Lichtknop overloop"
 

@@ -1,6 +1,6 @@
 substitutions:
   ip_address: 192.168.178.212
-  device_name: "lights-diningtable"
+  device_name: "switch-diningtable"
   switch_name: "Lichtpunt eettafel"
   sensor_name: "Lichtknop eettafel"
 
