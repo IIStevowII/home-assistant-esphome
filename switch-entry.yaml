@@ -1,6 +1,6 @@
 substitutions:
   ip_address: 192.168.178.210
-  device_name: "lights-entry"
+  device_name: "switch-entry"
   channel_1: "lights-hallway"
   channel_2: "lights-frontdoor"
 
@@ -65,6 +65,16 @@ i2c:
   scl: GPIO14
 
 sensor:
+  # Sensors with general information.
+  - platform: uptime
+    name: ${device_name}-uptime
+    entity_category: diagnostic
+
+  - platform: wifi_signal
+    name: ${device_name}-wifi-signal
+    update_interval: 60s
+    entity_category: diagnostic
+
   - platform: ade7953
     irq_pin: GPIO16 # Prevent overheating by setting this
     voltage:
