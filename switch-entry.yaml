@@ -97,7 +97,7 @@ sensor:
             - homeassistant.service:
                 service: persistent_notification.create
                 data:
-                  title: Message from ${devicename}
+                  title: Message from ${device_name}
                 data_template:
                   message: ${switch_name_2} turned off because power exceeded ${max_power}W
     active_power_b:
@@ -113,7 +113,7 @@ sensor:
             - homeassistant.service:
                 service: persistent_notification.create
                 data:
-                  title: Message from ${devicename}
+                  title: Message from ${device_name}
                 data_template:
                   message: ${switch_name_1} turned off because power exceeded ${max_power}W
     update_interval: 30s
@@ -153,7 +153,7 @@ sensor:
           - homeassistant.service:
               service: persistent_notification.create
               data:
-                title: Message from ${devicename}
+                title: Message from ${device_name}
               data_template:
                 message: Switches turned off because temperature exceeded ${max_temp}°C
   - platform: resistance
