@@ -11,7 +11,7 @@ substitutions:
   sensor_name_2: "Lichtknop voordeur"
 
   max_power: "2000.0"
-  max_temp: "70.0"
+  max_temp: "75.0"
 
 esphome:
   name: ${device_name}
