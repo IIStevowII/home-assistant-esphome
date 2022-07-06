@@ -197,6 +197,13 @@ binary_sensor:
               then:
                 # Do nothing, as the state of the binary sensor is already communicated
                 # We let Home Assistant decide what to do with it
+                - if:
+                    condition:
+                      switch.is_off: shelly_25_relay_1
+                    then:
+                      # If for some reason the connection was lost, the switch was turned off
+                      # and the connection was re-established, turn the switch on again
+                      - switch.turn_on: shelly_25_relay_1
               else:
                 # else, toggle relay
                 - switch.toggle: shelly_25_relay_1
@@ -219,6 +226,13 @@ binary_sensor:
               then:
                 # Do nothing, as the state of the binary sensor is already communicated
                 # We let Home Assistant decide what to do with it
+                - if:
+                    condition:
+                      switch.is_off: shelly_25_relay_2
+                    then:
+                      # If for some reason the connection was lost, the switch was turned off
+                      # and the connection was re-established, turn the switch on again
+                      - switch.turn_on: shelly_25_relay_2
               else:
                 # else, toggle relay
                 - switch.toggle: shelly_25_relay_2
