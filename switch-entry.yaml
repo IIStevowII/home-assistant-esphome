@@ -218,21 +218,6 @@ binary_sensor:
     # config for state change of input button
     on_state:
         then:
-          - if:
-              condition:
-                and:
-                  - wifi.connected:
-                  - api.connected:
-              then:
-                # Do nothing, as the state of the binary sensor is already communicated
-                # We let Home Assistant decide what to do with it
-                - if:
-                    condition:
-                      switch.is_off: shelly_25_relay_2
-                    then:
-                      # If for some reason the connection was lost, the switch was turned off
-                      # and the connection was re-established, turn the switch on again
-                      - switch.turn_on: shelly_25_relay_2
-              else:
-                # else, toggle relay
-                - switch.toggle: shelly_25_relay_2
+          # This switch does not control a smart light, but just a normal bulb, so just toggle relay
+          # The state of the binary sensor is already communicated, so we can still use it in Home Assistant
+          - switch.toggle: shelly_relay
