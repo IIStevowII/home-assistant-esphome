@@ -220,4 +220,4 @@ binary_sensor:
         then:
           # This switch does not control a smart light, but just a normal bulb, so just toggle relay
           # The state of the binary sensor is already communicated, so we can still use it in Home Assistant
-          - switch.toggle: shelly_relay
+          - switch.toggle: shelly_25_relay_2
